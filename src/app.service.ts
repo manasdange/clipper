@@ -18,10 +18,7 @@ export class AppService {
     const content = fs.readFileSync(file.path, 'utf-8')
     const arr = content.split('==========')
     arr.pop()
-    console.log("username", username.username)
 
-
-    
     let records = [];
     arr.map(ele => {
       let record = {};
@@ -43,11 +40,8 @@ export class AppService {
       records.push(record)
     })
 
-    //console.log(records)
-
     const entries = this.highlightsRepository.create(records)
     entries.shift()
-    console.log(entries[0])
 
     this.highlightsRepository.save(entries)
 
