@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { AppService } from './app.service';
-import { FetchHighlightsRequestDto } from './dto/highlights.dto';
+import { FetchAuthorsRequestDto, FetchBooksRequestDto, FetchHighlightsRequestDto, UpdateAuthorRequestDto } from './dto/highlights.dto';
 
 @ApiTags('Clipper')
 @Controller()
@@ -30,8 +30,24 @@ export class AppController {
   }
 
   @Get('fetch-highlights')
-  async fetchHighlights(@Query() filter: FetchHighlightsRequestDto){
+  async fetchHighlights(@Query() filter: FetchHighlightsRequestDto) {
     return this.appService.fetchHighlights(filter)
+  }
+
+  @Get('fetch-authors')
+  async fetchAuthors(@Query() request: FetchAuthorsRequestDto) {
+    return this.appService.fetchAuthors(request)
+  }
+
+  @Get('fetch-books')
+  async fetchBooks(@Query() request: FetchBooksRequestDto) {
+    return this.appService.fetchBooks(request)
+  }
+
+  @Post('update-author')
+  async updateAuthor(@Body() request: UpdateAuthorRequestDto){
+    await this.appService.updateAuthor(request)
+    return "author updated"
   }
 
 

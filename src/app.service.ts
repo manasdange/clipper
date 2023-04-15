@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { Highlights } from './highlights.entity';
 import {Repository} from 'typeorm';
 import {InjectRepository} from '@nestjs/typeorm'
-import { FetchHighlightsRequestDto } from './dto/highlights.dto';
+import { FetchAuthorsRequestDto, FetchBooksRequestDto, FetchHighlightsRequestDto, UpdateAuthorRequestDto } from './dto/highlights.dto';
 
 @Injectable()
 export class AppService {
@@ -63,10 +63,40 @@ export class AppService {
     }
   }
 
-  async fetchHighlights(filter) {
-
+  async fetchHighlights(filter: FetchHighlightsRequestDto) {
     const filteredData = await this.highlightsRepository.find({where: {...filter, hidden: false}})
     
     return {count: filteredData.length, data: filteredData}
   }
+
+  async fetchAuthors(request: FetchAuthorsRequestDto) {
+    const authors = await this.highlightsRepository.createQueryBuilder('highlights')
+    .select(['author'])
+    .distinct()
+    .getRawMany()
+    return {count: authors.length, authors}
+  }
+
+  async fetchBooks(request: FetchBooksRequestDto) {
+    if(!request.author) {
+      const books = await this.highlightsRepository.createQueryBuilder('highlights')
+      .select(['book', 'author'])
+      .distinct()
+      .getRawMany()
+      return {count: books.length, books};
+    } else {
+      const books = await this.highlightsRepository.createQueryBuilder('highlights')
+      .select(['book', 'author'])
+      .where('author = :author', {author: request.author})
+      .distinct()
+      .getRawMany()
+      return {count: books.length, books};
+    }
+  }
+
+  async updateAuthor(request: UpdateAuthorRequestDto) {
+    //const updates = await this.highlightsRepository.find({where: {username: request.username, author: request.currentName}});
+    await this.highlightsRepository.update({username: request.username, author: request.currentName}, {author: request.updatedName})
+  }
+
 }
