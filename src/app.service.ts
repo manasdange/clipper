@@ -14,6 +14,7 @@ export class AppService {
     return 'Hello World!';
   }
 
+
   async parseFile(file, username){
     const content = fs.readFileSync(file.path, 'utf-8')
     const arr = content.split('==========')
@@ -43,11 +44,21 @@ export class AppService {
     const entries = this.highlightsRepository.create(records)
     entries.shift()
 
-    this.highlightsRepository.save(entries)
+    return await this.handleDb(entries, username)
 
-    const count = entries.length
+  }
 
-    return(`${count} highlights added`)
+  async handleDb(entries: Highlights[], username) {
 
+    const countInDb = await this.highlightsRepository.count({where: username})
+    console.log(countInDb)
+    if(countInDb){
+      this.highlightsRepository.save(entries.slice(countInDb))
+      return(`${entries.length - countInDb} highlights added`)
+    }
+    else{
+      this.highlightsRepository.save(entries)
+      return(`${entries.length} highlights added`)
+    }
   }
 }
