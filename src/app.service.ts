@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import { Highlights } from './highlights.entity';
 import {Repository} from 'typeorm';
 import {InjectRepository} from '@nestjs/typeorm'
+import { FetchHighlightsRequestDto } from './dto/highlights.dto';
 
 @Injectable()
 export class AppService {
@@ -60,5 +61,12 @@ export class AppService {
       this.highlightsRepository.save(entries)
       return(`${entries.length} highlights added`)
     }
+  }
+
+  async fetchHighlights(filter) {
+
+    const filteredData = await this.highlightsRepository.find({where: {...filter, hidden: false}})
+    
+    return {count: filteredData.length, data: filteredData}
   }
 }
